@@ -22,6 +22,8 @@ private:
 
     bool _is_allocated = false;
 
+    int8_t **_address_table = NULL;
+
     void calcTotalSize(void)
     {
         _total_size = _dimension[0] * _dimension[1] * _dimension[2] * _dimension[3];
@@ -104,6 +106,28 @@ public:
     {
         _data = new int8_t[_total_size];
 
+        if(_dimension[2] == 1 && _dimension[3] == 1)
+        {
+            _address_table = new int8_t *[_dimension[1]];
+
+            for(uint16_t i = 0; i < _dimension[1]; i++)
+                _address_table[i] = _data + i * _dimension[0];
+        }
+        else if(_dimension[3] == 1)
+        {
+            _address_table = new int8_t *[_dimension[2]];
+
+            for(uint16_t i = 0; i < _dimension[2]; i++)
+                _address_table[i] = _data + i * _dimension[0] * _dimension[1];
+        }
+        else
+        {
+            _address_table = new int8_t *[_dimension[3]];
+
+            for(uint16_t i = 0; i < _dimension[3]; i++)
+                _address_table[i] = _data + 1 * _dimension[0] * _dimension[1] * _dimension[2];
+        }
+
         _is_allocated = true;
     }
 
@@ -118,6 +142,12 @@ public:
     {
         delete[] _data;
         _data = NULL;
+
+        if(_dimension[1] != 1)
+        {
+            delete[] _address_table;
+            _address_table = NULL;
+        }
 
         _is_allocated = false;
     }
@@ -152,6 +182,12 @@ public:
     int8_t fractional_length(void)
     {
         return _fractional_length;
+    }
+
+    /* Return a pointer to the start address of outermost dimension */
+    int8_t *ptr_outermost_dimension(uint16_t index)
+    {
+        return _address_table[index];
     }
 
     /* Set the fractional length */

@@ -4,7 +4,7 @@ project(CNN_Inference_for_ARMv8)
 
 set(CMAKE_CXX_FLAGS "-O3 -std=c++11 -DCPU_ONLY ${CMAKE_CXX_FLAGS}")
 
-set(CAFFE_ROOT "/home/firefly/Documents/Ristretto/caffe")
+set(CAFFE_ROOT "/home/firefly/Documents/caffe-1.0")
 
 include_directories(
     .
@@ -13,6 +13,7 @@ include_directories(
     high-level
     utils
     ${CAFFE_ROOT}/include
+    ${CAFFE_ROOT}/.build_release/src
 )
 
 link_directories(

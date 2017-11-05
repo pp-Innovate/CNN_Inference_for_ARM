@@ -1,6 +1,9 @@
 #include <iostream>
+#include <fstream>
 #include <unistd.h>
 #include <string>
+#include <cstring>
+#include <cstdlib>
 #include <sys/time.h>
 #include <cassert>
 
@@ -9,6 +12,8 @@
 #include "CI4A.h"
 
 using namespace std;
+
+void find_top_n(Tensor *input_tensor, uint8_t n, uint16_t *top_n_id);
 
 const string ZynqNet_Root = "../example/ZynqNet/";
 
@@ -67,8 +72,67 @@ int main(int argc, char *argv[])
     conv10.forward();
     pool10.forward();
 
-    TensorValidator::compare_with_file(pool10.ptr_output_tensor(), ZynqNet_Root + "data/pool10.dat", pool10.ptr_output_tensor()->total_size());
+    //ifstream ifile("/home/firefly/Documents/caffe-1.0/data/ilsvrc12/val.txt", ios::in);
 
+    //string sample;
+    //string file_name;
+    //int16_t label;
+    //uint16_t top_5[5];
+    //int32_t top_1_hit = 0;
+    //int32_t top_5_hit = 0;
+    //int32_t total_cnt = 0;
+
+    //while(getline(ifile, sample))
+    //{
+    //    int space_pos = sample.find(" ", 0);
+    //    file_name = sample.substr(0, space_pos);
+    //    label = atoi(sample.substr(space_pos + 1).c_str());
+
+    //    data.set_image_filename("/mnt/" + file_name);
+    //    data.forward();
+    //    conv1.forward();
+    //    relu_conv1.forward();
+    //    fire2.forward();
+    //    fire3.forward();
+    //    fire4.forward();
+    //    fire5.forward();
+    //    fire6.forward();
+    //    fire7.forward();
+    //    fire8.forward();
+    //    fire9.forward();
+    //    conv10_split1.forward();
+    //    conv10_split2.forward();
+    //    conv10.forward();
+    //    pool10.forward();
+
+    //    find_top_n(pool10.ptr_output_tensor(), 5, top_5);
+
+    //    for(uint8_t i = 0; i < 5; i++)
+    //    {
+    //        if(top_5[i] == label)
+    //        {
+    //            top_5_hit++;
+
+    //            if(i == 0)
+    //                top_1_hit++;
+
+    //            break;
+    //        }
+    //    }
+
+    //    total_cnt ++;
+
+    //    if(!(total_cnt % 1000))
+    //        cout << total_cnt << '\t' << top_1_hit/(float)total_cnt << '\t' << top_5_hit/(float)total_cnt << endl;
+    //}
+
+    //cout << "top-1: " << top_1_hit/(float)total_cnt << '\t' << "top-5: " << top_5_hit/(float)total_cnt << endl;
+
+    //ifile.close();
+
+    //TensorValidator::compare_with_file(relu_conv1.ptr_output_tensor(), ZynqNet_Root + "data/conv1.dat", relu_conv1.ptr_output_tensor()->total_size());
+    //TensorValidator::compare_with_file(pool10.ptr_output_tensor(), ZynqNet_Root + "data/pool10.dat", pool10.ptr_output_tensor()->total_size());
+    //
     timeval begin, after;
     gettimeofday(&begin, NULL);
     for(uint16_t i = 0; i < 100; i++)
@@ -158,4 +222,29 @@ int main(int argc, char *argv[])
     cout << "pool10 " << (after.tv_sec - begin.tv_sec) * 1000 + (after.tv_usec - begin.tv_usec) / 1000 << "ms" << endl;
 
     return 0;
+}
+
+void find_top_n(Tensor *input_tensor, uint8_t n, uint16_t *top_n_id)
+{
+    uint16_t *index_table = new uint16_t[input_tensor->total_size()];
+
+    for(uint16_t i = 0; i < input_tensor->total_size(); i++)
+        index_table[i] = i;
+
+    for(uint8_t i = 0; i < n; i++)
+    {
+        uint16_t max_id = i;
+
+        for(uint16_t j = i; j < input_tensor->total_size(); j++)
+            if(input_tensor->data()[index_table[j]] > input_tensor->data()[index_table[max_id]])
+                max_id = j;
+
+        uint16_t temp = index_table[i];
+        index_table[i] = index_table[max_id];
+        index_table[max_id] = temp;
+
+        top_n_id[i] = index_table[i];
+    }
+
+    delete[] index_table;
 }

@@ -33,8 +33,30 @@ private:
     Tensor *_output_tensor;
     Tensor *_weight_matrix;
 
-    /* Look-up tables for fast access */
-    int8_t **_ptr_input_channel;    //Dyanmic array of pointers;
+    void biases_preprocess(void)
+    {
+        int8x16_t vec_shift_bits = vdupq_n_s8(_fl_in);
+        int8x16_t vec_data;
+
+        int8_t *data = _biases->data();
+
+        for(uint16_t i = 0; i < _channel_out / 16; i++)
+        {
+            vec_data = vld1q_s8(data);
+            vec_data = vrshlq_s8(vec_data, vec_shift_bits);
+            vst1q_s8(data, vec_data);
+
+            data += 16;
+        }
+
+        for(uint8_t i = 0; i < _channel_out % 16; i++)
+            vec_data = vsetq_lane_s8(data[i], vec_data, i);
+
+        vec_data = vrshlq_s8(vec_data, vec_shift_bits);
+
+        for(uint8_t i = 0; i < _channel_out % 16; i++)
+            data[i] = vgetq_lane_s8(vec_data, i);
+    }
 
     void weights2matrix(void)
     {
@@ -57,13 +79,13 @@ private:
         if(!_input_tensor)
             for(uint16_t i = 0; i < _width * _height; i++)
                 for(uint16_t j = 0; j < _channel_in; j++)
-                    *(data_col++) = *(_ptr_input_channel[j] + i);
+                    *(data_col++) = *(_input_tensor->ptr_outermost_dimension(j) + i);
         else
         {
             for(uint16_t i = 0; i < _width * _height; i++)
             {
                 for(uint16_t j = 0; j < _channel_in; j++)
-                    *(data_col++) = *(_ptr_input_channel[j] + i);
+                    *(data_col++) = *(_input_tensor->ptr_outermost_dimension(j) + i);
                 for(uint16_t j = 0; j < _insert_zeros; j++)
                     *(data_col++) = 0;
             }
@@ -87,7 +109,7 @@ private:
             {
                 for(uint16_t channel = 0; channel < _channel_in; channel++)
                 {
-                    int8_t *data_im = _ptr_input_channel[channel];
+                    int8_t *data_im = _input_tensor->ptr_outermost_dimension(channel);
                     for(uint8_t kernel_row = 0; kernel_row < 3; kernel_row++)       //This loop can be unrolled if using flag "-O3"
                     {
                         int32_t input_row = input_row_start + kernel_row;
@@ -178,12 +200,6 @@ public:
         _insert_zeros = _mat_cols - _mat_cols_old;
         _mat_rows = (_channel_out % 4) ? (_channel_out / 4 + 1) : (_channel_out / 4);
 
-        /* Create the address table. Each element holds the start address of each input feature map */
-        _ptr_input_channel = new int8_t *[_channel_in];
-        size_t channel_size = _width * _height;
-        for(uint16_t channel = 0; channel < _channel_in; channel++)
-            _ptr_input_channel[channel] = _input_tensor->data() + channel * channel_size;
-
         /* Create weights and biases tensor objects */
         _weights = new Tensor(_kernel_size, _kernel_size, _channel_in, _channel_out, _fl_param);
         _weights->allocate();
@@ -240,12 +256,6 @@ public:
     Tensor *ptr_biases_tensor(void)
     {
         return _biases;
-    }
-
-    /* Destructor */
-    ~ConvolutionalLayer(void)
-    {
-        delete[] _ptr_input_channel;
     }
 
 };
