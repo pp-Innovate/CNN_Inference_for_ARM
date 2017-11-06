@@ -2,6 +2,10 @@
 #define __CI4A_H
 
 #include "tensor/Tensor.h"
+#include "tensor/Vector.h"
+#include "tensor/Matrix.h"
+#include "tensor/Tensor3D.h"
+#include "tensor/Tensor4D.h"
 
 #include "layers/InputLayer.h"
 #include "layers/ConvolutionalLayer.h"
