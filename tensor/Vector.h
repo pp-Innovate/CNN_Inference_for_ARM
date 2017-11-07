@@ -96,6 +96,16 @@ public:
         TensorBase<Type>::update_total_size();
     }
 
+    // ===  FUNCTION  ======================================================================
+    //         Name:  ~Vector
+    //  Description:  Destructor
+    // =====================================================================================
+    ~Vector(void)
+    {
+        if(TensorBase<Type>::_is_allocated)
+            release();
+    }
+
 }; // -----  end of class Vector  -----
 
 #endif /* __CI4A_VECTOR_H */

@@ -120,6 +120,16 @@ public:
         return _address_table[channel_index];
     }
 
+    // ===  FUNCTION  ======================================================================
+    //         Name:  ~Tensor3D
+    //  Description:  Destructor
+    // =====================================================================================
+    ~Tensor3D(void)
+    {
+        if(TensorBase<Type>::_is_allocated)
+            release();
+    }
+
 }; // -----  end of class Tensor3D  -----
 
 #endif /* __CI4A_TENSOR3D_H */

@@ -10,6 +10,7 @@
 #include "layers/InputLayer.h"
 #include "layers/ConvolutionalLayer.h"
 #include "layers/ReLULayer.h"
+#include "layers/ReLULayer_8b.h"
 #include "layers/ConcatLayer.h"
 #include "layers/GlobalPoolingLayer.h"
 

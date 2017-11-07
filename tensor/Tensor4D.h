@@ -121,6 +121,16 @@ public:
         return _address_table[batch_index];
     }
 
+    // ===  FUNCTION  ======================================================================
+    //         Name:  ~Tensor4D
+    //  Description:  Destructor
+    // =====================================================================================
+    ~Tensor4D(void)
+    {
+        if(TensorBase<Type>::_is_allocated)
+            release();
+    }
+
 }; // -----  end of class Tensor4D  -----
 
 #endif /* __CI4A_TENSOR4D_H */

@@ -118,6 +118,16 @@ public:
         return _address_table[row_index];
     }
 
+    // ===  FUNCTION  ======================================================================
+    //         Name:  ~Matrix
+    //  Description:  Destructor
+    // =====================================================================================
+    ~Matrix(void)
+    {
+        if(TensorBase<Type>::_is_allocated)
+            release();
+    }
+
 }; // -----  end of class Matrix  -----
 
 #endif /* __CI4A_MATRIX_H */

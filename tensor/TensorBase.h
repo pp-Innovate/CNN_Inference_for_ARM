@@ -89,16 +89,6 @@ public:
     virtual void release(void) = 0;
 
     // ===  FUNCTION  ======================================================================
-    //         Name:  ~TenosrBase
-    //  Description:  Destructor
-    // =====================================================================================
-    ~TensorBase(void)
-    {
-        if(_is_allocated)
-            release();
-    }
-
-    // ===  FUNCTION  ======================================================================
     //         Name:  is_allocated
     //  Description:  Return the memory allocation status
     // =====================================================================================
