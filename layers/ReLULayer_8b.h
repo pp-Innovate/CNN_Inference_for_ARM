@@ -82,13 +82,25 @@ public:
             output_data += 16;
         }
 
-        for(uint8_t i = 0; i < length_mod_16; i++)
-            vec_in = vsetq_lane_s8(*input_data++, vec_in, i);
+        //for(uint8_t i = 0; i < length_mod_16; i++)
+        //    vec_in = vld1q_lane_s8(input_data++, vec_in, i);
 
+        //vec_out = vmaxq_s8(vec_in, vec_zero);
+
+        //for(uint8_t i = 0; i < length_mod_16; i++)
+        //    vst1q_lane_s8(output_data++, vec_out, i);
+        
+        int8_t temp[16];
+
+        for(uint8_t i = 0; i < length_mod_16; i++)
+            temp[i] = *input_data++;
+
+        vec_in = vld1q_s8(temp);
         vec_out = vmaxq_s8(vec_in, vec_zero);
+        vst1q_s8(temp, vec_out);
 
         for(uint8_t i = 0; i < length_mod_16; i++)
-            *output_data++ = vgetq_lane_s8(vec_out, i);
+            *output_data++ = temp[i];
     }
 
 }; // -----  end of class ReLULayer_8b  -----

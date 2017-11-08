@@ -49,13 +49,25 @@ private:
             data += 16;
         }
 
-        for(uint8_t i = 0; i < _channel_out % 16; i++)
-            vec_data = vsetq_lane_s8(data[i], vec_data, i);
+        //for(uint8_t i = 0; i < _channel_out % 16; i++)
+        //    vec_data = vsetq_lane_s8(data[i], vec_data, i);
 
+        //vec_data = vrshlq_s8(vec_data, vec_shift_bits);
+
+        //for(uint8_t i = 0; i < _channel_out % 16; i++)
+        //    data[i] = vgetq_lane_s8(vec_data, i);
+        
+        int8_t temp[16];
+
+        for(uint8_t i = 0; i < _channel_out % 16; i++)
+            temp[i] = data[i];
+
+        vec_data = vld1q_s8(temp);
         vec_data = vrshlq_s8(vec_data, vec_shift_bits);
+        vst1q_s8(temp, vec_data);
 
         for(uint8_t i = 0; i < _channel_out % 16; i++)
-            data[i] = vgetq_lane_s8(vec_data, i);
+            data[i] = temp[i];
     }
 
     void weights2matrix(void)

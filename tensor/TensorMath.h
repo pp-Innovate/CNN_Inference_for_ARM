@@ -882,15 +882,27 @@ public:
             output_data += 16;
         }
 
-        int8x16_t vec_in = vdupq_n_s8(0);
+        //int8x16_t vec_in = vdupq_n_s8(0);
+
+        //for(uint8_t i = 0; i < total_size_mod_16; i++)
+        //    vec_in = vld1q_lane_s8(input_data++, vec_in, i);
+
+        //int8x16_t vec_out = vrshlq_s8(vec_in, vec_shift_bits);
+
+        //for(uint8_t i = 0; i < total_size_mod_16; i++)
+        //    vst1q_lane_s8(output_data++, vec_out, i);
+        
+        int8_t temp[16];
 
         for(uint8_t i = 0; i < total_size_mod_16; i++)
-            vec_in = vld1q_lane_s8(input_data++, vec_in, i);
+            temp[i] = *input_data++;
 
+        int8x16_t vec_in = vld1q_s8(temp);
         int8x16_t vec_out = vrshlq_s8(vec_in, vec_shift_bits);
+        vst1q_s8(temp, vec_out);
 
         for(uint8_t i = 0; i < total_size_mod_16; i++)
-            vst1q_lane_s8(output_data++, vec_out, i);
+            *output_data++ = temp[i];
     }
 
 };
