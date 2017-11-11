@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     //ifile.close();
 
     //TensorValidator::compare_with_file(relu_conv1.ptr_output_tensor(), ZynqNet_Root + "data/conv1.dat", relu_conv1.ptr_output_tensor()->total_size());
-    //TensorValidator::compare_with_file(pool10.ptr_output_tensor(), ZynqNet_Root + "data/pool10.dat", pool10.ptr_output_tensor()->total_size());
+    TensorValidator::compare_with_file(pool10.ptr_output_tensor(), ZynqNet_Root + "data/pool10.dat", pool10.ptr_output_tensor()->total_size());
     //
     timeval begin, after;
     gettimeofday(&begin, NULL);

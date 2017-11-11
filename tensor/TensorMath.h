@@ -7,6 +7,7 @@
 #include <arm_neon.h>
 
 #include "tensor/Tensor.h"
+#include "tensor/TensorBase.h"
 
 using namespace std;
 
@@ -891,6 +892,38 @@ public:
 
         //for(uint8_t i = 0; i < total_size_mod_16; i++)
         //    vst1q_lane_s8(output_data++, vec_out, i);
+        
+        int8_t temp[16];
+
+        for(uint8_t i = 0; i < total_size_mod_16; i++)
+            temp[i] = *input_data++;
+
+        int8x16_t vec_in = vld1q_s8(temp);
+        int8x16_t vec_out = vrshlq_s8(vec_in, vec_shift_bits);
+        vst1q_s8(temp, vec_out);
+
+        for(uint8_t i = 0; i < total_size_mod_16; i++)
+            *output_data++ = temp[i];
+    }
+
+    static void shift_and_copy_8b(TensorBase<int8_t> *input_tensor, int8_t *output_data, int8_t shift_bits)
+    {
+        size_t total_size_div_16 = input_tensor->total_size() / 16;
+        uint8_t total_size_mod_16 = input_tensor->total_size() % 16;
+
+        int8x16_t vec_shift_bits = vdupq_n_s8(shift_bits);
+
+        int8_t *input_data = input_tensor->data();
+
+        for(size_t i = 0; i < total_size_div_16; i++)
+        {
+            int8x16_t vec_in = vld1q_s8(input_data);
+            int8x16_t vec_out = vrshlq_s8(vec_in, vec_shift_bits);
+            vst1q_s8(output_data, vec_out);
+
+            input_data += 16;
+            output_data += 16;
+        }
         
         int8_t temp[16];
 
