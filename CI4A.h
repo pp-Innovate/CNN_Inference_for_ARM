@@ -15,6 +15,7 @@
 #include "layers/ConcatLayer_8b.h"
 #include "layers/GlobalPoolingLayer.h"
 #include "layers/GlobalPoolingLayer_8b.h"
+#include "layers/SoftmaxLayer_f.h"
 
 #include "utils/TensorValidator.h"
 #include "utils/ParamLoader.h"

@@ -86,5 +86,4 @@ public:
 
 }; // -----  end of class GlobalPoolingLayer_8b  -----
 
-
 #endif /* __CI4A_GLOBALPOOLINGLAYER_8B_H */
